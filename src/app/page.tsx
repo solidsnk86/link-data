@@ -8,7 +8,7 @@ export default function Home() {
         <span className="font-display text-lg font-medium tracking-tight">
           LinkData
         </span>
-        <span className="font-mono text-xs uppercase tracking-widest text-muted">
+        <span className="font-mono text-[10px] md:text-xs uppercase tracking-widest text-muted">
           sin cuentas · sin registros
         </span>
       </header>
@@ -37,7 +37,7 @@ export default function Home() {
         </div>
       </article> 
 
-        <p className="mt-5 max-w-md text-base text-muted sm:text-lg z-50">
+        <p className="mt-5 max-w-3xl text-sm text-muted sm:text-base z-50">
           Transmite tu cámara en vivo o comparte un archivo con un link. Todo
           corre directo entre navegadores — nada se queda guardado en un
           servidor intermedio.

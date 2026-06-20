@@ -145,7 +145,7 @@ export default function WatchPage() {
               {paused && (
                 <div className="absolute top-1/2 left-1/2 translate-[-50%] cursor-pointer">
                   <div
-                    className="flex justify-center mx-auto w-10 h-10 bg-signal/50 border border-signal backdrop-blur-md rounded-full py-1 hover:outline-2 hover:outline-amber-800 hover:outline-offset-3"
+                    className="flex justify-center mx-auto w-10 h-10 backdrop-blur-md rounded-full"
                     onPlaying={() => setPaused(false)}
                     onClick={() => {
                       if (videoRef.current) {
@@ -155,10 +155,9 @@ export default function WatchPage() {
                     }}
                   >
                     <div className="">
-                      <Play size={28} />
+                      <Play size={32} />
                     </div>
                   </div>
-                  <small className="">Iniciar transmisión</small>
                 </div>
               )}
               <video

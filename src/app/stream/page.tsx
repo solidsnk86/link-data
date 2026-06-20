@@ -7,9 +7,17 @@ import { PulseSignature } from "@/components/PulseSignature";
 import { StatusDot } from "@/components/StatusDot";
 import { CopyLink } from "@/components/CopyLink";
 import { createRoomCode } from "@/lib/ids";
-import { ArrowLeft, ScreenShare, Share2, SwitchCamera } from "lucide-react";
+import {
+  ArrowLeft,
+  Loader2,
+  ScreenShare,
+  Share2,
+  SwitchCamera,
+} from "lucide-react";
 import { useLocation } from "../context/LocationContext";
 import { share } from "@/lib/share";
+import { get } from "http";
+import Image from "next/image";
 
 type Status = "requesting-camera" | "connecting" | "live" | "ended" | "error";
 type FacingMode = "user" | "environment";
@@ -20,7 +28,8 @@ type UserSystem =
   | "macOs"
   | "Android"
   | "iOS"
-  | "No Disponible";
+  | "No Disponible"
+  | DisplayMediaStreamOptions;
 
 export default function StreamPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -37,7 +46,9 @@ export default function StreamPage() {
   const [hasMultipleCameras, setHasMultipleCameras] = useState(false);
   const [switchingCamera, setSwitchingCamera] = useState(false);
   const cameraTrackRef = useRef<MediaStreamTrack | null>(null);
+  const micTrackRef = useRef<MediaStreamTrack | null>(null);
   const [sharingWindow, setSharingWindow] = useState(false);
+  const [qrCode, setQrCode] = useState<string>("");
 
   const cleanup = useCallback(() => {
     viewerCallsRef.current.forEach((call) => call.close());
@@ -149,7 +160,7 @@ export default function StreamPage() {
     try {
       const newStream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: { exact: nextFacing } },
-        audio: false,
+        audio: true,
       });
       const newTrack = newStream.getVideoTracks()[0];
       const oldTrack = streamRef.current.getVideoTracks()[0];
@@ -181,42 +192,76 @@ export default function StreamPage() {
 
     try {
       const newStream = await navigator.mediaDevices.getDisplayMedia({
-        video: true,
+        video: { displaySurface: "monitor" },
         audio: true,
+        systemAudio: "include",
+        selfBrowserSurface: "exclude",
+        surfaceSwitching: "include",
       });
 
-      const newTrack = newStream.getVideoTracks()[0];
-      const oldTrack = streamRef.current.getVideoTracks()[0];
+      const newVideoTrack = newStream.getVideoTracks()[0];
+      const newAudioTrack = newStream.getAudioTracks()[0];
+
+      const oldVideoTrack = streamRef.current.getVideoTracks()[0];
+      const oldAudioTrack = streamRef.current.getAudioTracks()[0];
 
       viewerCallsRef.current.forEach((call) => {
-        const sender = call.peerConnection
-          ?.getSenders()
-          .find((s) => s.track?.kind === "video");
+        const senders = call.peerConnection?.getSenders() ?? [];
 
-        sender?.replaceTrack(newTrack);
+        senders
+          .find((s) => s.track?.kind === "video")
+          ?.replaceTrack(newVideoTrack);
+
+        if (newAudioTrack) {
+          senders
+            .find((s) => s.track?.kind === "audio")
+            ?.replaceTrack(newAudioTrack);
+        }
       });
 
-      cameraTrackRef.current = oldTrack;
-      streamRef.current.removeTrack(oldTrack);
-      streamRef.current.addTrack(newTrack);
+      cameraTrackRef.current = oldVideoTrack;
+      micTrackRef.current = oldAudioTrack ?? null;
+
+      streamRef.current.removeTrack(oldVideoTrack);
+      streamRef.current.addTrack(newVideoTrack);
+      oldVideoTrack.stop();
+
+      if (newAudioTrack && oldAudioTrack) {
+        streamRef.current.removeTrack(oldAudioTrack);
+        streamRef.current.addTrack(newAudioTrack);
+        // no detenemos oldAudioTrack: queda guardado en micTrackRef para restaurarlo
+      }
+
       setSharingWindow(true);
 
-      newTrack.onended = () => {
+      newVideoTrack.onended = () => {
         const cameraTrack = cameraTrackRef.current;
-
+        const micTrack = micTrackRef.current;
         if (!cameraTrack) return;
 
         viewerCallsRef.current.forEach((call) => {
-          const sender = call.peerConnection
-            ?.getSenders()
-            .find((s) => s.track?.kind === "video");
+          const senders = call.peerConnection?.getSenders() ?? [];
 
-          sender?.replaceTrack(cameraTrack);
+          senders
+            .find((s) => s.track?.kind === "video")
+            ?.replaceTrack(cameraTrack);
+
+          if (micTrack) {
+            senders
+              .find((s) => s.track?.kind === "audio")
+              ?.replaceTrack(micTrack);
+          }
         });
 
         setSharingWindow(false);
-        streamRef.current?.removeTrack(newTrack);
+        streamRef.current?.removeTrack(newVideoTrack);
         streamRef.current?.addTrack(cameraTrack);
+
+        if (micTrack && newAudioTrack) {
+          streamRef.current?.removeTrack(newAudioTrack);
+          streamRef.current?.addTrack(micTrack);
+          newAudioTrack.stop();
+        }
       };
     } catch (error) {
       console.error("No se pudo compartir la pantalla", error);
@@ -228,16 +273,28 @@ export default function StreamPage() {
     setStatus("ended");
   }
 
+  const getQrCodeDataBaseURL = useCallback(async (url: string) => {
+    await fetch(`https://solid-geolocation.vercel.app/qr/buffer?text=${url}`)
+      .then((res) => res.json())
+      .then((qr) => setQrCode(qr.dataBaseURL))
+      .catch((err) => console.error(err));
+  }, []);
+
   const watchUrl =
     roomCode && typeof window !== "undefined"
       ? `${window.location.origin}/watch/${roomCode}`
       : "";
 
+  useEffect(() => {
+    if (!watchUrl) return;
+    getQrCodeDataBaseURL(watchUrl);
+  }, [watchUrl, getQrCodeDataBaseURL]);
+
   return (
-    <div className="flex flex-1 flex-col px-6 py-8 sm:px-10 z-50">
+    <div className="flex flex-1 flex-col px-6 pb-8 sm:px-10 z-50">
       <Link
         href="/"
-        className="font-display text-sm font-medium flex gap-2 items-center"
+        className="font-display text-sm font-medium flex gap-2 items-center mt-6"
       >
         <ArrowLeft size={16} />
         Volver
@@ -342,6 +399,22 @@ export default function StreamPage() {
                   </div>
                 </div>
                 <CopyLink value={watchUrl} tone="signal" />
+                <div className="grid justify-center mt-2 items-center">
+                  <div className="flex flex-1 items-center gap-3 my-4">
+                    <div className="w-16 h-px bg-muted" />
+                    <p className="text-center font-mono text-xs uppercase tracking-widest text-muted">
+                      o escanea el qr
+                    </p>
+                    <div className="w-16 h-px bg-muted" />
+                  </div>
+                  <div className="grid mx-auto content-center">
+                    {qrCode ? (
+                      <Image src={qrCode} alt="" width={64} height={64} />
+                    ) : (
+                      <Loader2 className="animate-spin" />
+                    )}
+                  </div>
+                </div>
               </div>
             )}
 
