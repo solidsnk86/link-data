@@ -142,24 +142,6 @@ export default function WatchPage() {
               <StatusDot label="en vivo" tone="signal" blink />
             </div>
             <div className="aspect-video w-full overflow-hidden border border-border bg-surface relative">
-              {paused && (
-                <div className="absolute top-1/2 left-1/2 translate-[-50%] cursor-pointer">
-                  <div
-                    className="flex justify-center mx-auto w-10 h-10 backdrop-blur-md rounded-full"
-                    onPlaying={() => setPaused(false)}
-                    onClick={() => {
-                      if (videoRef.current) {
-                        videoRef.current.play();
-                        setPaused(false);
-                      }
-                    }}
-                  >
-                    <div className="">
-                      <Play size={32} />
-                    </div>
-                  </div>
-                </div>
-              )}
               <video
                 ref={videoRef}
                 controls
