@@ -28,7 +28,6 @@ export default function StreamPage() {
   const streamRef = useRef<MediaStream | null>(null);
   const viewerCallsRef = useRef<Map<string, MediaConnection>>(new Map());
   const { data: location } = useLocation();
-  const [device, setDevice] = useState<Device>("desktop");
   const [status, setStatus] = useState<Status>("requesting-camera");
   const [roomCode, setRoomCode] = useState<string | null>(null);
   const [viewerCount, setViewerCount] = useState(0);
@@ -47,10 +46,10 @@ export default function StreamPage() {
     peerRef.current?.destroy();
   }, []);
 
-  const userSystem: UserSystem = location.sysInfo.system as UserSystem;
-  if (userSystem === "Android" || userSystem === "iOS") {
-    setDevice("phone");
-  }
+  const userSystem = location.sysInfo.system as UserSystem;
+
+  const device: Device =
+    userSystem === "Android" || userSystem === "iOS" ? "phone" : "desktop";
 
   // --- se revisa cuántas cámaras hay disponibles ---
   useEffect(() => {
