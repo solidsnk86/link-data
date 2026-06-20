@@ -18,7 +18,6 @@ export default function WatchPage() {
   const peerRef = useRef<PeerType | null>(null);
   const [status, setStatus] = useState<Status>("connecting");
   const [stream, setStream] = useState<MediaStream | null>(null);
-  const [paused, setPaused] = useState<boolean>(true);
 
   useEffect(() => {
     let cancelled = false;
@@ -31,8 +30,7 @@ export default function WatchPage() {
 
       peer.on("open", () => {
         if (cancelled) return;
-        // open a data connection just to signal our presence — the
-        // broadcaster listens for this and calls us back with media
+
         const conn = peer.connect(roomId);
 
         timeoutId = setTimeout(() => {
