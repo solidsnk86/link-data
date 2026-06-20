@@ -6,7 +6,7 @@ import type { Peer as PeerType } from "peerjs";
 import Link from "next/link";
 import { PulseSignature } from "@/components/PulseSignature";
 import { StatusDot } from "@/components/StatusDot";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Play } from "lucide-react";
 
 type Status = "connecting" | "live" | "ended" | "not-found" | "error";
 
@@ -88,9 +88,12 @@ export default function WatchPage() {
 
   return (
     <div className="flex flex-1 flex-col px-6 py-8 sm:px-10 z-50">
-      <Link href="/" className="font-display text-sm font-medium flex gap-2 items-center">
-      <ArrowLeft size={16} />
-         Volver
+      <Link
+        href="/"
+        className="font-display text-sm font-medium flex gap-2 items-center"
+      >
+        <ArrowLeft size={16} />
+        Volver
       </Link>
 
       <div className="mx-auto flex w-full max-w-xl flex-1 flex-col items-center justify-center text-center">
@@ -143,6 +146,7 @@ export default function WatchPage() {
                 <div className="absolute top-1/2 left-1/2 translate-[-50%] cursor-pointer">
                   <div
                     className="flex justify-center mx-auto w-10 h-10 bg-signal/50 border border-signal backdrop-blur-md rounded-full py-1 hover:outline-2 hover:outline-amber-800 hover:outline-offset-3"
+                    onPlaying={() => setPaused(false)}
                     onClick={() => {
                       if (videoRef.current) {
                         videoRef.current.play();
@@ -150,7 +154,9 @@ export default function WatchPage() {
                       }
                     }}
                   >
-                    <div className="rotate-90 text-xl translate-x-0.5">🔺</div>
+                    <div className="">
+                      <Play size={28} />
+                    </div>
                   </div>
                   <small className="">Iniciar transmisión</small>
                 </div>
