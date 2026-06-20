@@ -9,7 +9,7 @@ export default function Home() {
           LinkData
         </span>
         <span className="font-mono text-xs uppercase tracking-widest text-muted">
-          sin cuentas · sin datos
+          sin cuentas · sin registros
         </span>
       </header>
 

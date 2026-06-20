@@ -47,7 +47,6 @@ export default function StreamPage() {
   }, []);
 
   const userSystem = location.sysInfo.system as UserSystem;
-
   const device: Device =
     userSystem === "Android" || userSystem === "iOS" ? "phone" : "desktop";
 
@@ -167,7 +166,6 @@ export default function StreamPage() {
       // las llamadas futuras quedan sincronizadas automáticamente)
       streamRef.current.removeTrack(oldTrack);
       streamRef.current.addTrack(newTrack);
-      oldTrack.stop();
 
       setFacingMode(nextFacing);
     } catch (err) {
@@ -331,7 +329,7 @@ export default function StreamPage() {
                       />
                     </button>
                     {/* --- botón para transmitir pantalla --- */}
-                    {!sharingWindow && (
+                    {!sharingWindow && device === "desktop" && (
                       <button
                         onClick={switchShareWindowsMedia}
                         disabled={sharingWindow}
