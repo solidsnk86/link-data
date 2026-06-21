@@ -406,11 +406,11 @@ export default function StreamPage() {
                     </p>
                     <div className="w-16 h-px bg-muted" />
                   </div>
-                  <div className="grid mx-auto content-center">
+                  <div className="grid mx-auto content-center aspect-square">
                     {qrCode ? (
                       <Image src={qrCode} alt="" width={144} height={144} />
                     ) : (
-                      <Loader2 className="animate-spin" />
+                      <Loader2 className="animate-spin" size={32} />
                     )}
                   </div>
                 </div>
