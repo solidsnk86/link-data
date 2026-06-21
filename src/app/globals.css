@@ -182,3 +182,28 @@ body {
     transform: rotateY(180deg);
   }
 }
+
+#copy {
+  animation: iconOut 0.5s backwards;
+}
+#copy-check {
+  animation: iconIn 0.5s forwards;
+}
+
+@keyframes iconIn {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes iconOut {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

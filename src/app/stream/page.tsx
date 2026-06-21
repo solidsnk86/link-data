@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 import { useLocation } from "../context/LocationContext";
 import { share } from "@/lib/share";
-import { get } from "http";
 import Image from "next/image";
 
 type Status = "requesting-camera" | "connecting" | "live" | "ended" | "error";
@@ -42,7 +41,7 @@ export default function StreamPage() {
   const [viewerCount, setViewerCount] = useState(0);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   // --- estado para cambio de cámara ---
-  const [facingMode, setFacingMode] = useState<FacingMode>("environment");
+  const [facingMode, setFacingMode] = useState<FacingMode>("user");
   const [hasMultipleCameras, setHasMultipleCameras] = useState(false);
   const [switchingCamera, setSwitchingCamera] = useState(false);
   const cameraTrackRef = useRef<MediaStreamTrack | null>(null);
@@ -409,7 +408,7 @@ export default function StreamPage() {
                   </div>
                   <div className="grid mx-auto content-center">
                     {qrCode ? (
-                      <Image src={qrCode} alt="" width={64} height={64} />
+                      <Image src={qrCode} alt="" width={144} height={144} />
                     ) : (
                       <Loader2 className="animate-spin" />
                     )}

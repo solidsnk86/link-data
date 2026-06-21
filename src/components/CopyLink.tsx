@@ -1,22 +1,31 @@
 "use client";
 
 import { Copy, CopyCheck } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-export function CopyLink({ value, tone = "signal" }: { value: string; tone?: "signal" | "data" }) {
+export function CopyLink({
+  value,
+  tone = "signal",
+}: {
+  value: string;
+  tone?: "signal" | "data";
+}) {
   const [copied, setCopied] = useState(false);
 
   async function handleCopy() {
     try {
       await navigator.clipboard.writeText(value);
       setCopied(true);
-      setTimeout(() => setCopied(false), 1800);
+      setTimeout(() => {
+        setCopied(false);
+      }, 1800);
     } catch {
       // clipboard API unavailable
     }
   }
 
-  const ring = tone === "signal" ? "focus-visible:ring-signal" : "focus-visible:ring-data";
+  const ring =
+    tone === "signal" ? "focus-visible:ring-signal" : "focus-visible:ring-data";
 
   return (
     <div className="flex w-full items-stretch gap-2">
@@ -25,13 +34,27 @@ export function CopyLink({ value, tone = "signal" }: { value: string; tone?: "si
       </div>
       <button
         onClick={handleCopy}
-        className={`shrink-0 px-2 py-2 font-mono text-xs uppercase tracking-widest transition-colors outline-none focus-visible:ring-2 ${ring} ${
-          tone === "signal"
-            ? "bg-signal text-background hover:opacity-90"
-            : "bg-data text-background hover:opacity-90"
-        }`}
+        title="Copiar link"
+        className={`shrink-0 px-2 py-2 font-mono text-xs uppercase tracking-widest transition-colors outline-none hover:bg-signal/75 group
+           ${ring} ${
+             tone === "signal"
+               ? "bg-signal text-background hover:opacity-90"
+               : "bg-data text-background hover:opacity-90"
+           }`}
       >
-        {copied ? (<CopyCheck size={24} />) : (<Copy size={24} />)}
+        {copied ? (
+          <CopyCheck
+            id="copy-check"
+            className="text-zinc-300 group-hover:text-zinc-200"
+            size={24}
+          />
+        ) : (
+          <Copy
+            id="copy"
+            className="text-zinc-300 group-hover:text-zinc-200"
+            size={24}
+          />
+        )}
       </button>
     </div>
   );
