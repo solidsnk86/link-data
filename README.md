@@ -1,4 +1,4 @@
-# Señal
+# LinkData
 
 Una web para dos cosas:
 
@@ -21,7 +21,7 @@ Una web para dos cosas:
 
 ```bash
 pnpm install
-cp .env.example .env.local
+cp .env .env.local
 ```
 
 Necesitas un **Blob Store** de Vercel para que la subida de archivos funcione (el streaming no
@@ -66,5 +66,4 @@ src/lib/                    → generación de códigos/ids, formato de tamaños
   tu propio [PeerServer](https://github.com/peers/peerjs-server) o migrar a un SFU.
 - No hay autenticación ni límite de quién puede ver un stream o descargar un archivo: cualquiera
   con el link puede entrar. Suficiente para compartir entre amigos/equipo, no para datos sensibles.
-- Los archivos no expiran solos. Para eso, lo más simple sería un cron job en Vercel que liste y
-  borre blobs más viejos que X días.
+- El archivo expiran ni bien el usuario descarga del link.
