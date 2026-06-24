@@ -14,8 +14,7 @@ Una web para dos cosas:
   Agora, etc.) — eso es un cambio de arquitectura, no solo de código.
 - **Transferencia de archivos**: subida directa del navegador a [Vercel Blob](https://vercel.com/docs/storage/vercel-blob)
   (sin pasar por una función serverless, así que no hay límite de tamaño de payload). El link de
-  descarga es permanente hasta que borres el archivo manualmente — no hay expiración automática
-  todavía.
+  descarga no es permanente, al descargar el archivo, automáticamente se elimina el archivo y por ende el link queda obsoleto.
 
 ## Configuración local
 
@@ -28,7 +27,7 @@ Necesitas un **Blob Store** de Vercel para que la subida de archivos funcione (e
 necesita esto, no usa Vercel Blob):
 
 1. En tu proyecto de Vercel → **Storage** → **Create Database** → **Blob**.
-2. Copia el `BLOB_READ_WRITE_TOKEN` que te da y pégalo en `.env.local`.
+2. Copia el `BLOB_READ_WRITE_TOKEN` que te da y pégalo en `.env.local` o `.env`.
 
 ```bash
 pnpm run dev
